@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Form from './components/Form/Form';
+import { SigninForm } from './SigninForm';
 
-class Signin extends React.Component {
+export class SigninFormContainer extends React.Component {
   constructor(props) {
     super(props);
 
@@ -54,10 +54,11 @@ class Signin extends React.Component {
 
   render() {
     return (
-      <Form onSubmit={this.onSubmit} onInputChange={this.onChange} errors={this.state.errors}/>
+      <SigninForm
+        onSubmit={this.onSubmit}
+        onInputChange={this.onChange}
+        errors={this.state.errors}
+      />
     );
   }
 }
-
-export default Signin;
-

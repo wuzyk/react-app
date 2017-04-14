@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class Form extends Component {
+export class SigninForm extends Component {
   render() {
     const { errors, onSubmit, onInputChange } = this.props;
 

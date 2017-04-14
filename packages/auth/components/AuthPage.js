@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 
-export default class Dashboard extends Component {
+export class AuthPage extends Component {
   render() {
+    console.log('render Auth');
     return (
-      <div className="dashboard">
+      <div className="auth">
+        <h1>Auth</h1>
         {this.props.children}
       </div>
     );
