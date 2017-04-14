@@ -1,4 +1,7 @@
 {
   "name": "auth",
-  "version": "0.0.1"
+  "version": "0.0.0",
+  "dependencies": {
+    "ui": "^0.0.0"
+  }
 }

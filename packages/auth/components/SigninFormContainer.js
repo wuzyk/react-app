@@ -8,7 +8,8 @@ export class SigninFormContainer extends React.Component {
 
     this.state = {
       fields: {},
-      errors: {}
+      errors: {},
+      isFetching: false,
     };
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -22,6 +23,9 @@ export class SigninFormContainer extends React.Component {
 
     if (errors === false) {
       // login
+      this.setState({
+        isFetching: true
+      })
     }
     else {
       this.setState({
@@ -58,6 +62,7 @@ export class SigninFormContainer extends React.Component {
         onSubmit={this.onSubmit}
         onInputChange={this.onChange}
         errors={this.state.errors}
+        isFetching={this.state.isFetching}
       />
     );
   }

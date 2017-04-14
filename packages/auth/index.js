@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { AuthPageContainer } from './components/AuthPageContainer';
 
-const isAuthenticated = true;
+const isAuthenticated = false;
 
 const PrivateRoute = (props) => {
   const { redirect, ...restProps } = props;
