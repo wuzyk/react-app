@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export class AuthPage extends Component {
+class AuthPage extends Component {
   render() {
     return (
       <div className="auth">
@@ -10,3 +10,5 @@ export class AuthPage extends Component {
     );
   }
 }
+
+export default AuthPage;

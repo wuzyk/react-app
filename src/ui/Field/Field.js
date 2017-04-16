@@ -8,9 +8,7 @@ export class Field extends Component {
       <div className="field">
         <label htmlFor={name}>{label}</label>
         <input type="text" id={name} name={name} {...restProps} />
-        {error &&
-          <div className="error">{error}</div>
-        }
+        {error && <div className="error">{error}</div>}
       </div>
     );
   }

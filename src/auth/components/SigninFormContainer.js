@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { SigninForm } from './SigninForm';
+import SigninForm from './SigninForm';
 
-export class SigninFormContainer extends React.Component {
+class SigninFormContainer extends React.Component {
   constructor(props) {
     super(props);
 
@@ -23,25 +23,22 @@ export class SigninFormContainer extends React.Component {
 
     if (errors === false) {
       // login
-      this.setState({
-        isFetching: true
-      })
-    }
-    else {
-      this.setState({
-        errors
-      });
+      this.setState(() => ({
+        isFetching: true,
+      }));
+    } else {
+      this.setState(() => ({
+        errors,
+      }));
     }
   }
 
   validate() {
     const { login, password } = this.state.fields;
 
-    if (!login)
-      return { login: 'Enter login' };
+    if (!login) return { login: 'Enter login' };
 
-    if (!password)
-      return { password: 'Enter password' };
+    if (!password) return { password: 'Enter password' };
 
     return false;
   }
@@ -67,3 +64,5 @@ export class SigninFormContainer extends React.Component {
     );
   }
 }
+
+export default SigninFormContainer;

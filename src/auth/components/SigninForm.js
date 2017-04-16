@@ -1,8 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { Field, Button } from 'ui';
 
-export class SigninForm extends Component {
+class SigninForm extends Component {
   render() {
     const { errors, onSubmit, onInputChange, isFetching } = this.props;
 
@@ -14,16 +15,16 @@ export class SigninForm extends Component {
             name="login"
             label="Login"
             onInput={onInputChange}
-            error={errors.login} />
+            error={errors.login}
+          />
           <Field
             type="password"
             name="password"
             label="Password"
             onInput={onInputChange}
-            error={errors.password} />
-          {errors.common &&
-            <div className="error">{errors.common}</div>
-          }
+            error={errors.password}
+          />
+          {errors.common && <div className="error">{errors.common}</div>}
           <Button primary disabled={isFetching}>
             {isFetching ? 'Вхожу...' : 'Войти'}
           </Button>
@@ -38,8 +39,10 @@ SigninForm.propTypes = {
   isFetching: PropTypes.bool.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-}
+};
 
 SigninForm.defaultProps = {
-  errors: {}
-}
+  errors: {},
+};
+
+export default SigninForm;
