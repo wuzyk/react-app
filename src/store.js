@@ -6,7 +6,6 @@ const rootReducer = combineReducers(
 );
 
 function allReducers(requireContext) {
-  console.log(requireContext.keys());
   return requireContext.keys().reduce((reducers, reducer) => {
     const featureName = reducer.split('/')[1];
     return {

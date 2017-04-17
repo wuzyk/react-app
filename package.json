@@ -2,6 +2,7 @@
   "name": "react-app",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://www.walletone.com",
   "dependencies": {
     "lerna": "^2.0.0-rc.2",
     "react": "^15.4.2",

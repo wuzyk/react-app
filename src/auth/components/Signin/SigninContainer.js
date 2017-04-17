@@ -1,6 +1,7 @@
 import React from 'react';
-
-import SigninForm from './SigninForm';
+import { connect } from 'react-redux';
+import { createSession } from '../../store';
+import SigninForm from './Signin';
 
 class SigninFormContainer extends React.Component {
   constructor(props) {
@@ -9,7 +10,7 @@ class SigninFormContainer extends React.Component {
     this.state = {
       fields: {},
       errors: {},
-      isFetching: false,
+      isFetching: false
     };
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -22,13 +23,21 @@ class SigninFormContainer extends React.Component {
     let errors = this.validate();
 
     if (errors === false) {
-      // login
+      const { login, password } = this.state.fields;
+
       this.setState(() => ({
-        isFetching: true,
+        isFetching: true
       }));
+
+      this.props.dispatch(createSession(login, password)).catch(error =>
+        this.setState(() => ({
+          isFetching: false,
+          errors: { common: error.message }
+        }))
+      );
     } else {
       this.setState(() => ({
-        errors,
+        errors
       }));
     }
   }
@@ -36,9 +45,13 @@ class SigninFormContainer extends React.Component {
   validate() {
     const { login, password } = this.state.fields;
 
-    if (!login) return { login: 'Enter login' };
+    if (!login) {
+      return { login: 'Enter login' };
+    }
 
-    if (!password) return { password: 'Enter password' };
+    if (!password) {
+      return { password: 'Enter password' };
+    }
 
     return false;
   }
@@ -48,8 +61,8 @@ class SigninFormContainer extends React.Component {
     this.setState(state => ({
       fields: {
         ...state.fields,
-        [target.name]: target.value,
-      },
+        [target.name]: target.value
+      }
     }));
   }
 
@@ -65,4 +78,4 @@ class SigninFormContainer extends React.Component {
   }
 }
 
-export default SigninFormContainer;
+export default connect()(SigninFormContainer);

@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import { Auth } from 'auth';
-import { UserPage } from 'user';
+import { User } from 'user';
 
 const App = () => {
   return (
@@ -10,7 +10,7 @@ const App = () => {
       <Router>
         <Auth>
           <Switch>
-            <Route path="/" component={UserPage} />
+            <Route path="/" component={User} />
           </Switch>
         </Auth>
       </Router>

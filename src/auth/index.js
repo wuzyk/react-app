@@ -1,3 +1,3 @@
-import Auth from './components/Auth';
+import AuthContainer from './components/Auth/AuthContainer';
 
-export { Auth };
+export { AuthContainer as Auth };

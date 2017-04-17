@@ -1,1 +1,3 @@
-export { UserPage } from './components/UserPage';
+import UserContainer from './components/User/UserContainer';
+
+export { UserContainer as User };

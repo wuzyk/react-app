@@ -1,57 +1,164 @@
-const LOGIN_REQUEST = 'auth/LOGIN_REQUEST';
-const LOGIN_SUCCESS = 'auth/LOGIN_SUCCESS';
-const GET_SESSION_REQUEST = 'auth/GET_SESSION_REQUEST';
-const GET_SESSION_SUCCESS = 'auth/GET_SESSION_SUCCESS';
+import { apiCall } from 'api';
+
+const SESSION_VALIDATE_REQUEST = 'auth/SESSION_VALIDATE_REQUEST';
+const SESSION_VALIDATE_SUCCESS = 'auth/SESSION_VALIDATE_SUCCESS';
+const SESSION_VALIDATE_FAILURE = 'auth/SESSION_VALIDATE_FAILURE';
+
+const SESSION_CREATE_REQUEST = 'auth/SESSION_CREATE_REQUEST';
+const SESSION_CREATE_SUCCESS = 'auth/SESSION_CREATE_SUCCESS';
+
+const SESSION_CLOSE_REQUEST = 'auth/SESSION_SLOSE_REQUEST';
+
+export const AUTH_STATE = {
+  SESSION_LOADING: 'SESSION_LOADING',
+  SESSION_REQUIRED: 'SESSION_REQUIRED',
+  SESSION_VALID: 'SESSION_VALID'
+};
+
+const SESSION_TOKEN_STORAGE_NAME = 'sessionToken';
+
+const sessionToken = localStorage.getItem(SESSION_TOKEN_STORAGE_NAME);
 
 const INITIAL_STATE = {
-  sessionToken: '1123',
-  isLoggining: false,
-  isGettingSession: false,
-  isLoggedIn: false,
+  sessionToken,
+  status: AUTH_STATE.SESSION_REQUIRED
 };
 
-export const login = (login, password) => dispatch => {
-  dispatch(LOGIN_REQUEST);
-};
-
-export const getSession = sessionToken => dispatch => {
-  dispatch({
-    type: GET_SESSION_REQUEST,
-  });
-
-  return new Promise(resolve => {
-    setTimeout(() => {
-      dispatch({
-        type: GET_SESSION_SUCCESS,
-        response: {
-          token: '123',
-        },
-      });
-    }, 5000);
-  });
-};
+//
+// reducer
+//
 
 const reducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case LOGIN_REQUEST:
+    case SESSION_VALIDATE_REQUEST:
       return {
         ...state,
-        isLoggining: true,
+        status: AUTH_STATE.SESSION_LOADING
       };
-    case GET_SESSION_REQUEST:
+    case SESSION_VALIDATE_SUCCESS:
       return {
         ...state,
-        isGettingSession: true,
+        status: AUTH_STATE.SESSION_VALID,
+        session: action.payload
       };
-    case GET_SESSION_SUCCESS:
+    case SESSION_VALIDATE_FAILURE:
       return {
         ...state,
-        isGettingSession: false,
-        isLoggedIn: true,
+        status: AUTH_STATE.SESSION_REQUIRED
       };
+    case SESSION_CREATE_SUCCESS:
+      return {
+        ...state,
+        status: AUTH_STATE.SESSION_VALID,
+        sessionToken: action.payload.Token,
+        session: action.payload
+      };
+    case SESSION_CLOSE_REQUEST:
+      return {
+        ...state,
+        status: AUTH_STATE.SESSION_LOADING
+      };
+
     default:
       return state;
   }
 };
 
+reducer.getSessionToken = state => state.auth.sessionToken;
+reducer.getAuthStatus = state => state.auth.status;
+reducer.getUserId = state => state.auth.session && state.auth.session.UserId;
+
 export default reducer;
+
+//
+// actions
+//
+
+export const validateSession = (() => {
+  const request = {
+    type: SESSION_VALIDATE_REQUEST
+  };
+
+  const requestSuccess = payload => ({
+    type: SESSION_VALIDATE_SUCCESS,
+    payload
+  });
+
+  const requestFailure = payload => ({
+    type: SESSION_VALIDATE_FAILURE,
+    payload
+  });
+
+  return () => (dispatch, getState) => {
+    const sessionToken = reducer.getSessionToken(getState());
+
+    if (!sessionToken) {
+      return;
+    }
+
+    dispatch(request);
+
+    return apiCall({
+      url: '/OpenApi/sessions/current',
+      secure: false,
+      headers: {
+        Authorization: `Bearer ${sessionToken}`
+      }
+    }).then(
+      payload => dispatch(requestSuccess(payload)),
+      payload => {
+        localStorage.removeItem(SESSION_TOKEN_STORAGE_NAME);
+        dispatch(requestFailure(payload));
+      }
+    );
+  };
+})();
+
+export const createSession = (() => {
+  const request = {
+    type: SESSION_CREATE_REQUEST
+  };
+
+  const requestSuccess = payload => ({
+    type: SESSION_CREATE_SUCCESS,
+    payload
+  });
+
+  return (login, password) => dispatch => {
+    dispatch(request);
+
+    return apiCall({
+      url: '/OpenApi/sessions',
+      secure: false,
+      method: 'POST',
+      json: {
+        Login: login,
+        Password: password,
+        Scope: 'All'
+      }
+    }).then(payload => {
+      localStorage.setItem(SESSION_TOKEN_STORAGE_NAME, payload.Token);
+      dispatch(requestSuccess(payload));
+    });
+  };
+})();
+
+export const closeSession = (() => {
+  const request = {
+    type: SESSION_CLOSE_REQUEST
+  };
+
+  const shutdown = () => {
+    localStorage.removeItem(SESSION_TOKEN_STORAGE_NAME);
+    location.reload();
+  };
+
+  return () => dispatch => {
+    dispatch(request);
+
+    return apiCall({
+      url: '/OpenApi/sessions',
+      method: 'DELETE'
+    }).then(shutdown, shutdown);
+  };
+})();
