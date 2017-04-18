@@ -9,6 +9,7 @@ class User extends Component {
       <div>
         <div>{name}</div>
         <Button type="button" onClick={this.props.closeSession}>Logout</Button>
+        <Button type="button" onClick={this.props.fetchProfile}>Update</Button>
       </div>
     );
   }

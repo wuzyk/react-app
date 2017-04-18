@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as auth from 'auth';
+import { closeSession } from 'auth/reducer';
 import reducer, { fetchProfile } from '../../reducer';
 import User from './User';
-
-const { closeSession } = auth.actions;
 
 class UserContainer extends Component {
   componentWillMount() {
@@ -22,10 +20,12 @@ class UserContainer extends Component {
 }
 
 export default connect(
-  state => ({
-    isFetching: reducer.getIsFetching(state),
-    firstName: reducer.getUserAttr(state, 'FirstName'),
-    lastName: reducer.getUserAttr(state, 'LastName')
-  }),
+  state => {
+    return {
+      isFetching: reducer.getIsFetching(state),
+      firstName: reducer.getUserAttr(state, 'FirstName'),
+      lastName: reducer.getUserAttr(state, 'LastName')
+    };
+  },
   dispatch => bindActionCreators({ fetchProfile, closeSession }, dispatch)
 )(UserContainer);

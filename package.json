@@ -12,7 +12,8 @@
     "redux": "^3.6.0",
     "redux-act": "^1.1.1",
     "redux-loop": "^2.2.2",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "reselect": "^3.0.0"
   },
   "devDependencies": {
     "autoprefixer": "6.7.2",

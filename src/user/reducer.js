@@ -1,4 +1,4 @@
-import { apiCall } from 'api';
+import * as api from './api';
 import { createReducer, createAction } from 'redux-act';
 import { loop, Effects } from 'redux-loop';
 
@@ -10,10 +10,10 @@ const fetchProfile = createAction('start fetching profile');
 const fetchProfileSuccess = createAction('fetch profile success');
 const fetchProfileFailure = createAction('fetch profile failure');
 
-const fetchProfileApiCall = () => {
-  return apiCall({
-    url: '/OpenApi/profile'
-  }).then(fetchProfileSuccess, fetchProfileFailure);
+const fetchProfileApiCall = userId => {
+  return api
+    .fetchProfile(userId)
+    .then(fetchProfileSuccess, fetchProfileFailure);
 };
 
 export { fetchProfile };
@@ -30,14 +30,12 @@ const INITIAL_STATE = {
 
 const reducer = createReducer(
   {
-    [fetchProfile]: state =>
-      loop(
-        {
-          ...state,
-          isFetching: true
-        },
+    [fetchProfile]: state => {
+      return loop(
+        { ...state, isFetching: true },
         Effects.promise(fetchProfileApiCall)
-      ),
+      );
+    },
     [fetchProfileSuccess]: (state, payload) => ({
       ...state,
       isFetching: false,
@@ -55,10 +53,10 @@ const reducer = createReducer(
   INITIAL_STATE
 );
 
+reducer.getIsFetching = state => state.user.isFetching;
 reducer.getUserAttr = (state, attrType) => {
   const attr = state.user.attrsByType[attrType];
   return attr && (attr.DisplayValue || attr.RawValue);
 };
-reducer.getIsFetching = state => state.user.isFetching;
 
 export default reducer;

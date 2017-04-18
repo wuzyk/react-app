@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createSession } from '../../reducer';
+import reducer, { createSession } from '../../reducer';
 import SigninForm from './Signin';
 
 class SigninFormContainer extends React.Component {
@@ -29,12 +29,13 @@ class SigninFormContainer extends React.Component {
         isFetching: true
       }));
 
-      this.props.dispatch(createSession({ login, password })).catch(error =>
+      this.props.dispatch(createSession({ login, password })).catch(error => {
+        debugger;
         this.setState(() => ({
           isFetching: false,
           errors: { common: error.message }
-        }))
-      );
+        }));
+      });
     } else {
       this.setState(() => ({
         errors
@@ -78,4 +79,7 @@ class SigninFormContainer extends React.Component {
   }
 }
 
-export default connect()(SigninFormContainer);
+export default connect(state => ({
+  error: reducer.getError(state),
+  isCreating: reducer.getIsCreating(state)
+}))(SigninFormContainer);

@@ -1,8 +1,14 @@
 import { createReducer, createAction } from 'redux-act';
 import { loop, Effects } from 'redux-loop';
-import { apiCall } from 'api';
+import * as api from './api';
 import { SESSION_TOKEN_STORAGE_KEY } from 'constants';
-import { AUTH_STATE } from './constants';
+
+const AUTH_STATE = {
+  SESSION_LOADING: 'SESSION_LOADING',
+  SESSION_REQUIRED: 'SESSION_REQUIRED',
+  SESSION_VALID: 'SESSION_VALID',
+  SESSION_CREATING: 'SESSION_CREATING'
+};
 
 //
 // actions
@@ -13,18 +19,14 @@ const validateSessionSuccess = createAction('validate session success');
 const validateSessionFailure = createAction('validate session failure');
 const createSession = createAction('create session success');
 const createSessionSuccess = createAction('create session success');
+const createSessionFailure = createAction('create session failure');
 const closeSession = createAction('close session request');
 const closeSessionResult = createAction('close session result');
 
 const validateSessionApiCall = sessionToken => {
-  return apiCall({
-    url: '/OpenApi/sessions/current',
-    secure: false,
-    headers: {
-      Authorization: `Bearer ${sessionToken}`
-    }
-  })
-    .then(payload => validateSessionSuccess(payload))
+  return api
+    .validateSession(sessionToken)
+    .then(validateSessionSuccess)
     .catch(error => {
       localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
       return validateSessionFailure(error);
@@ -32,19 +34,13 @@ const validateSessionApiCall = sessionToken => {
 };
 
 const createSessionApiCall = ({ login, password }) => {
-  return apiCall({
-    url: '/OpenApi/sessions',
-    secure: false,
-    method: 'POST',
-    json: {
-      Login: login,
-      Password: password,
-      Scope: 'All'
-    }
-  }).then(payload => {
-    localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, payload.Token);
-    return createSessionSuccess(payload);
-  });
+  return api
+    .createSession(login, password)
+    .then(payload => {
+      localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, payload.Token);
+      return createSessionSuccess(payload);
+    })
+    .catch(createSessionFailure);
 };
 
 const shutdown = () => {
@@ -54,10 +50,7 @@ const shutdown = () => {
 };
 
 const closeSessionApiCall = () => {
-  return apiCall({
-    url: '/OpenApi/sessions',
-    method: 'DELETE'
-  }).then(shutdown, shutdown);
+  return api.closeSession().then(shutdown, shutdown);
 };
 
 export { validateSession, createSession, closeSession };
@@ -68,19 +61,18 @@ export { validateSession, createSession, closeSession };
 
 const INITIAL_STATE = {
   sessionToken: localStorage.getItem(SESSION_TOKEN_STORAGE_KEY),
-  status: AUTH_STATE.SESSION_REQUIRED
+  status: AUTH_STATE.SESSION_REQUIRED,
+  error: null
 };
 
 const reducer = createReducer(
   {
-    [validateSession]: (state, token) =>
-      loop(
-        {
-          ...state,
-          status: AUTH_STATE.SESSION_LOADING
-        },
+    [validateSession]: (state, token) => {
+      return loop(
+        { ...state, status: AUTH_STATE.SESSION_LOADING },
         Effects.promise(validateSessionApiCall, token)
-      ),
+      );
+    },
     [validateSessionSuccess]: (state, payload) => ({
       ...state,
       status: AUTH_STATE.SESSION_VALID,
@@ -90,28 +82,44 @@ const reducer = createReducer(
       ...state,
       status: AUTH_STATE.SESSION_REQUIRED
     }),
-    [createSession]: (state, payload) =>
-      loop(state, Effects.promise(createSessionApiCall, payload)),
+    [createSession]: (state, payload) => {
+      return loop(
+        { ...state, error: null, status: AUTH_STATE.SESSION_CREATING },
+        Effects.promise(createSessionApiCall, payload)
+      );
+    },
+    [createSessionFailure]: (state, payload) => ({
+      ...state,
+      status: AUTH_STATE.SESSION_REQUIRED,
+      error: payload
+    }),
     [createSessionSuccess]: (state, payload) => ({
       ...state,
       status: AUTH_STATE.SESSION_VALID,
       sessionToken: payload.Token,
       session: payload
     }),
-    [closeSession]: state =>
-      loop(
-        {
-          ...state,
-          status: AUTH_STATE.SESSION_LOADING
-        },
+    [closeSession]: state => {
+      return loop(
+        { ...state, status: AUTH_STATE.SESSION_LOADING },
         Effects.promise(closeSessionApiCall)
-      )
+      );
+    }
   },
   INITIAL_STATE
 );
 
 reducer.getSessionToken = state => state.auth.sessionToken;
-reducer.getAuthStatus = state => state.auth.status;
-reducer.getUserId = state => state.auth.session && state.auth.session.UserId;
+reducer.getUserId = state => {
+  return state.auth.session && state.auth.session.UserId;
+};
+reducer.getError = state => state.auth.error;
+reducer.getIsValid = state => state.auth.status === AUTH_STATE.SESSION_VALID;
+reducer.getIsCreating = state => {
+  return state.auth.status === AUTH_STATE.SESSION_CREATING;
+};
+reducer.getIsLoading = state => {
+  return state.auth.status === AUTH_STATE.SESSION_LOADING;
+};
 
 export default reducer;
