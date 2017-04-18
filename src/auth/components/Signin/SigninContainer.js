@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createSession } from '../../store';
+import { createSession } from '../../reducer';
 import SigninForm from './Signin';
 
 class SigninFormContainer extends React.Component {

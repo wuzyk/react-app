@@ -16,6 +16,7 @@ class SigninForm extends Component {
             label="Login"
             onInput={onInputChange}
             error={errors.login}
+            disabled={isFetching}
           />
           <Field
             type="password"
@@ -23,6 +24,7 @@ class SigninForm extends Component {
             label="Password"
             onInput={onInputChange}
             error={errors.password}
+            disabled={isFetching}
           />
           {errors.common && <div className="error">{errors.common}</div>}
           <Button primary disabled={isFetching}>
@@ -38,11 +40,11 @@ SigninForm.propTypes = {
   errors: PropTypes.object,
   isFetching: PropTypes.bool.isRequired,
   onInputChange: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 SigninForm.defaultProps = {
-  errors: {},
+  errors: {}
 };
 
 export default SigninForm;

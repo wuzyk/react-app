@@ -2,7 +2,8 @@
   "name": "auth",
   "version": "0.0.0",
   "dependencies": {
-    "ui": "^0.0.0",
-    "api": "^0.0.0"
+    "ui": "0.0.0",
+    "api": "0.0.0",
+    "constants": "0.0.0"
   }
 }

@@ -1,20 +1,7 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
+import reducer from './reducer';
 
-const rootReducer = combineReducers(
-  allReducers(require.context('.', true, /^\.\/[^/]*\/store\.js$/)),
-);
-
-function allReducers(requireContext) {
-  return requireContext.keys().reduce((reducers, reducer) => {
-    const featureName = reducer.split('/')[1];
-    return {
-      ...reducers,
-      [featureName]: requireContext(reducer).default,
-    };
-  }, {});
-}
-
-const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
+const store = createStore(reducer, applyMiddleware(thunkMiddleware));
 
 export default store;

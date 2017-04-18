@@ -1,7 +1,4 @@
-import store from '../store';
-import authStore from '../auth/store';
-
-const APP_TOKEN = '992E98CD-8346-4898-B51B-33CF3C839CD7';
+import { APP_TOKEN, SESSION_TOKEN_STORAGE_KEY } from 'constants';
 
 const defaultHeaders = {
   Authorization: `Bearer ${APP_TOKEN}`,
@@ -21,7 +18,7 @@ export const apiCall = (config = {}) => {
   };
 
   if (config.secure !== false) {
-    const token = authStore.getSessionToken(store.getState());
+    const token = localStorage.getItem(SESSION_TOKEN_STORAGE_KEY);
     headers.Authorization = `Bearer ${token}`;
   }
 

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
-import store from '../../store';
-import { validateSession, AUTH_STATE } from '../../store';
+import { AUTH_STATE } from '../../constants';
+import reducer, { validateSession } from '../../reducer';
 import AuthPage from './Auth';
 import SigninFormContainer from '../Signin/SigninContainer';
 
@@ -34,5 +34,5 @@ class Auth extends Component {
 }
 
 export default connect(state => ({
-  status: store.getAuthStatus(state)
+  status: reducer.getAuthStatus(state)
 }))(Auth);

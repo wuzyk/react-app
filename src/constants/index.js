@@ -1,0 +1,2 @@
+export const APP_TOKEN = '992E98CD-8346-4898-B51B-33CF3C839CD7';
+export const SESSION_TOKEN_STORAGE_KEY = 'sessionToken';
