@@ -1,5 +1,26 @@
 import { apiCall } from 'api';
 import { createReducer, createAction } from 'redux-act';
+import { loop, Effects } from 'redux-loop';
+
+//
+// actions
+//
+
+const fetchProfile = createAction('start fetching profile');
+const fetchProfileSuccess = createAction('fetch profile success');
+const fetchProfileFailure = createAction('fetch profile failure');
+
+const fetchProfileApiCall = () => {
+  return apiCall({
+    url: '/OpenApi/profile'
+  }).then(fetchProfileSuccess, fetchProfileFailure);
+};
+
+export { fetchProfile };
+
+//
+// reducer
+//
 
 const INITIAL_STATE = {
   isFetching: false,
@@ -7,17 +28,17 @@ const INITIAL_STATE = {
   attrsByType: {}
 };
 
-const load = createAction('start fetching profile');
-const loadSuccess = createAction('fetch profile success');
-const loadFailure = createAction('fetch profile failure');
-
 const reducer = createReducer(
   {
-    [load]: state => ({
-      ...state,
-      isFetching: true
-    }),
-    [loadSuccess]: (state, payload) => ({
+    [fetchProfile]: state =>
+      loop(
+        {
+          ...state,
+          isFetching: true
+        },
+        Effects.promise(fetchProfileApiCall)
+      ),
+    [fetchProfileSuccess]: (state, payload) => ({
       ...state,
       isFetching: false,
       data: payload,
@@ -26,7 +47,7 @@ const reducer = createReducer(
         return result;
       }, {})
     }),
-    [loadFailure]: state => ({
+    [fetchProfileFailure]: state => ({
       ...state,
       isFetching: false
     })
@@ -41,18 +62,3 @@ reducer.getUserAttr = (state, attrType) => {
 reducer.getIsFetching = state => state.user.isFetching;
 
 export default reducer;
-
-//
-// actions
-//
-
-export const fetchProfile = () => (dispatch, getState) => {
-  dispatch(load());
-
-  return apiCall({
-    url: '/OpenApi/profile'
-  }).then(
-    payload => dispatch(loadSuccess(payload)),
-    payload => dispatch(loadFailure(payload))
-  );
-};

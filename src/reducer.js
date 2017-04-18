@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from 'redux-loop';
 
 export default combineReducers(
   allReducers(require.context('.', true, /^\.\/[^/]*\/reducer\.js$/))

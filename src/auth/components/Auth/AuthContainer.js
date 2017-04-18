@@ -8,7 +8,10 @@ import SigninFormContainer from '../Signin/SigninContainer';
 
 class Auth extends Component {
   componentWillMount() {
-    this.props.dispatch(validateSession());
+    const { token, dispatch } = this.props;
+    if (token) {
+      dispatch(validateSession(token));
+    }
   }
 
   render() {
@@ -34,5 +37,6 @@ class Auth extends Component {
 }
 
 export default connect(state => ({
-  status: reducer.getAuthStatus(state)
+  status: reducer.getAuthStatus(state),
+  token: reducer.getSessionToken(state)
 }))(Auth);

@@ -29,7 +29,7 @@ class SigninFormContainer extends React.Component {
         isFetching: true
       }));
 
-      this.props.dispatch(createSession(login, password)).catch(error =>
+      this.props.dispatch(createSession({ login, password })).catch(error =>
         this.setState(() => ({
           isFetching: false,
           errors: { common: error.message }
