@@ -1,14 +1,15 @@
 import * as api from './api';
 import { createReducer, createAction } from 'redux-act';
 import { loop, Effects } from 'redux-loop';
+import { sessionReceived } from 'auth/reducer';
 
 //
 // actions
 //
 
-const fetchProfile = createAction('start fetching profile');
-const fetchProfileSuccess = createAction('fetch profile success');
-const fetchProfileFailure = createAction('fetch profile failure');
+export const fetchProfile = createAction('start fetching profile');
+export const fetchProfileSuccess = createAction('fetch profile success');
+export const fetchProfileFailure = createAction('fetch profile failure');
 
 const fetchProfileApiCall = userId => {
   return api
@@ -16,24 +17,27 @@ const fetchProfileApiCall = userId => {
     .then(fetchProfileSuccess, fetchProfileFailure);
 };
 
-export { fetchProfile };
-
 //
 // reducer
 //
 
 const INITIAL_STATE = {
   isFetching: false,
+  userId: null,
   data: {},
   attrsByType: {}
 };
 
 const reducer = createReducer(
   {
+    [sessionReceived]: (state, payload) => ({
+      ...state,
+      userId: payload.UserId
+    }),
     [fetchProfile]: state => {
       return loop(
         { ...state, isFetching: true },
-        Effects.promise(fetchProfileApiCall)
+        Effects.promise(fetchProfileApiCall, state.userId)
       );
     },
     [fetchProfileSuccess]: (state, payload) => ({

@@ -7,14 +7,15 @@ import { SESSION_TOKEN_STORAGE_KEY } from 'constants';
 // actions
 //
 
-const validateSession = createAction('validate session request');
-const validateSessionSuccess = createAction('validate session success');
-const validateSessionFailure = createAction('validate session failure');
-const createSession = createAction('create session success');
-const createSessionSuccess = createAction('create session success');
-const createSessionFailure = createAction('create session failure');
-const closeSession = createAction('close session request');
-const closeSessionResult = createAction('close session result');
+export const validateSession = createAction('validate session request');
+export const validateSessionSuccess = createAction('validate session success');
+export const validateSessionFailure = createAction('validate session failure');
+export const createSession = createAction('create session success');
+export const createSessionSuccess = createAction('create session success');
+export const createSessionFailure = createAction('create session failure');
+export const closeSession = createAction('close session request');
+export const closeSessionResult = createAction('close session result');
+export const sessionReceived = createAction('session received');
 
 const validateSessionApiCall = sessionToken => {
   return api
@@ -46,8 +47,6 @@ const closeSessionApiCall = () => {
   return api.closeSession().then(shutdown, shutdown);
 };
 
-export { validateSession, createSession, closeSession };
-
 //
 // reducer
 //
@@ -68,12 +67,12 @@ const reducer = createReducer(
         Effects.promise(validateSessionApiCall, token)
       );
     },
-    [validateSessionSuccess]: (state, payload) => ({
-      ...state,
-      isLoading: false,
-      isValid: true,
-      session: payload
-    }),
+    [validateSessionSuccess]: (state, payload) => {
+      return loop(
+        { ...state, isLoading: false },
+        Effects.call(sessionReceived, payload)
+      );
+    },
     [validateSessionFailure]: state => ({
       ...state,
       isLoading: false
@@ -84,16 +83,21 @@ const reducer = createReducer(
         Effects.promise(createSessionApiCall, payload)
       );
     },
-    [createSessionSuccess]: (state, payload) => ({
-      ...state,
-      isValid: true,
-      isLoggining: false,
-      session: payload
-    }),
+    [createSessionSuccess]: (state, payload) => {
+      return loop(
+        { ...state, isLoggining: false },
+        Effects.call(sessionReceived, payload)
+      );
+    },
     [createSessionFailure]: (state, error) => ({
       ...state,
       isLoggining: false,
       error: error.message
+    }),
+    [sessionReceived]: (state, payload) => ({
+      ...state,
+      isValid: true,
+      session: payload
     }),
     [closeSession]: state => {
       return loop(
