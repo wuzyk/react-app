@@ -3,13 +3,6 @@ import { loop, Effects } from 'redux-loop';
 import * as api from './api';
 import { SESSION_TOKEN_STORAGE_KEY } from 'constants';
 
-const AUTH_STATE = {
-  SESSION_LOADING: 'SESSION_LOADING',
-  SESSION_REQUIRED: 'SESSION_REQUIRED',
-  SESSION_VALID: 'SESSION_VALID',
-  SESSION_CREATING: 'SESSION_CREATING'
-};
-
 //
 // actions
 //
@@ -61,7 +54,9 @@ export { validateSession, createSession, closeSession };
 
 const INITIAL_STATE = {
   sessionToken: localStorage.getItem(SESSION_TOKEN_STORAGE_KEY),
-  status: AUTH_STATE.SESSION_REQUIRED,
+  isValid: false,
+  isLoading: false,
+  isLoggining: false,
   error: null
 };
 
@@ -69,57 +64,55 @@ const reducer = createReducer(
   {
     [validateSession]: (state, token) => {
       return loop(
-        { ...state, status: AUTH_STATE.SESSION_LOADING },
+        { ...state, isLoading: true },
         Effects.promise(validateSessionApiCall, token)
       );
     },
     [validateSessionSuccess]: (state, payload) => ({
       ...state,
-      status: AUTH_STATE.SESSION_VALID,
+      isLoading: false,
+      isValid: true,
       session: payload
     }),
     [validateSessionFailure]: state => ({
       ...state,
-      status: AUTH_STATE.SESSION_REQUIRED
+      isLoading: false
     }),
     [createSession]: (state, payload) => {
       return loop(
-        { ...state, error: null, status: AUTH_STATE.SESSION_CREATING },
+        { ...state, error: null, isLoggining: true },
         Effects.promise(createSessionApiCall, payload)
       );
     },
-    [createSessionFailure]: (state, payload) => ({
-      ...state,
-      status: AUTH_STATE.SESSION_REQUIRED,
-      error: payload
-    }),
     [createSessionSuccess]: (state, payload) => ({
       ...state,
-      status: AUTH_STATE.SESSION_VALID,
-      sessionToken: payload.Token,
+      isValid: true,
+      isLoggining: false,
       session: payload
+    }),
+    [createSessionFailure]: (state, error) => ({
+      ...state,
+      isLoggining: false,
+      error: error.message
     }),
     [closeSession]: state => {
       return loop(
-        { ...state, status: AUTH_STATE.SESSION_LOADING },
+        { ...state, isLoading: true },
         Effects.promise(closeSessionApiCall)
       );
-    }
+    },
+    [closeSessionResult]: state => ({
+      ...state,
+      isLoading: false
+    })
   },
   INITIAL_STATE
 );
 
 reducer.getSessionToken = state => state.auth.sessionToken;
-reducer.getUserId = state => {
-  return state.auth.session && state.auth.session.UserId;
-};
 reducer.getError = state => state.auth.error;
-reducer.getIsValid = state => state.auth.status === AUTH_STATE.SESSION_VALID;
-reducer.getIsCreating = state => {
-  return state.auth.status === AUTH_STATE.SESSION_CREATING;
-};
-reducer.getIsLoading = state => {
-  return state.auth.status === AUTH_STATE.SESSION_LOADING;
-};
+reducer.getIsValid = state => state.auth.isValid;
+reducer.getIsLoggining = state => state.auth.isLoggining;
+reducer.getIsLoading = state => state.auth.isLoading;
 
 export default reducer;

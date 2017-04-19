@@ -5,7 +5,13 @@ import { Field, Button } from 'ui';
 
 class SigninForm extends Component {
   render() {
-    const { errors, onSubmit, onInputChange, isFetching } = this.props;
+    const {
+      onSubmit,
+      onInputChange,
+      isProcessing,
+      signinError,
+      validationErrors
+    } = this.props;
 
     return (
       <div className="Signin">
@@ -15,20 +21,20 @@ class SigninForm extends Component {
             name="login"
             label="Login"
             onInput={onInputChange}
-            error={errors.login}
-            disabled={isFetching}
+            error={validationErrors.login}
+            disabled={isProcessing}
           />
           <Field
             type="password"
             name="password"
             label="Password"
             onInput={onInputChange}
-            error={errors.password}
-            disabled={isFetching}
+            error={validationErrors.password}
+            disabled={isProcessing}
           />
-          {errors.common && <div className="error">{errors.common}</div>}
-          <Button primary disabled={isFetching}>
-            {isFetching ? 'Вхожу...' : 'Войти'}
+          {signinError && <div className="error">{signinError}</div>}
+          <Button primary disabled={isProcessing}>
+            {isProcessing ? 'Вхожу...' : 'Войти'}
           </Button>
         </form>
       </div>
@@ -37,8 +43,9 @@ class SigninForm extends Component {
 }
 
 SigninForm.propTypes = {
-  errors: PropTypes.object,
-  isFetching: PropTypes.bool.isRequired,
+  validationErrors: PropTypes.object,
+  signinError: PropTypes.string,
+  isProcessing: PropTypes.bool.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import reducer, { createSession } from '../../reducer';
 import SigninForm from './Signin';
 
@@ -9,52 +10,51 @@ class SigninFormContainer extends React.Component {
 
     this.state = {
       fields: {},
-      errors: {},
-      isFetching: false
+      validationErrors: {}
     };
 
     this.onSubmit = this.onSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
+  render() {
+    return (
+      <SigninForm
+        onSubmit={this.onSubmit}
+        onInputChange={this.onChange}
+        isProcessing={this.props.isProcessing}
+        signinError={this.props.signinError}
+        validationErrors={this.state.validationErrors}
+      />
+    );
+  }
+
   onSubmit(event) {
     event.preventDefault();
 
-    let errors = this.validate();
-
-    if (errors === false) {
+    if (this.validate() === true) {
       const { login, password } = this.state.fields;
-
-      this.setState(() => ({
-        isFetching: true
-      }));
-
-      this.props.dispatch(createSession({ login, password })).catch(error => {
-        debugger;
-        this.setState(() => ({
-          isFetching: false,
-          errors: { common: error.message }
-        }));
-      });
-    } else {
-      this.setState(() => ({
-        errors
-      }));
+      this.props.createSession({ login, password });
     }
   }
 
   validate() {
     const { login, password } = this.state.fields;
+    let error;
 
     if (!login) {
-      return { login: 'Enter login' };
+      error = { login: 'Enter login' };
     }
 
     if (!password) {
-      return { password: 'Enter password' };
+      error = { password: 'Enter password' };
     }
 
-    return false;
+    this.setState(() => ({
+      validationErrors: error || {}
+    }));
+
+    return error === undefined;
   }
 
   onChange(event) {
@@ -66,20 +66,12 @@ class SigninFormContainer extends React.Component {
       }
     }));
   }
-
-  render() {
-    return (
-      <SigninForm
-        onSubmit={this.onSubmit}
-        onInputChange={this.onChange}
-        errors={this.state.errors}
-        isFetching={this.state.isFetching}
-      />
-    );
-  }
 }
 
-export default connect(state => ({
-  error: reducer.getError(state),
-  isCreating: reducer.getIsCreating(state)
-}))(SigninFormContainer);
+export default connect(
+  state => ({
+    signinError: reducer.getError(state),
+    isProcessing: reducer.getIsLoggining(state)
+  }),
+  dispatch => bindActionCreators({ createSession }, dispatch)
+)(SigninFormContainer);
