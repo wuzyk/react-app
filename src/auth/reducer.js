@@ -22,7 +22,7 @@ const validateSessionApiCall = sessionToken => {
     .validateSession(sessionToken)
     .then(validateSessionSuccess)
     .catch(error => {
-      localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
+      if (localStorage) localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
       return validateSessionFailure(error);
     });
 };
@@ -31,14 +31,15 @@ const createSessionApiCall = ({ login, password }) => {
   return api
     .createSession(login, password)
     .then(payload => {
-      localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, payload.Token);
+      if (localStorage)
+        localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, payload.Token);
       return createSessionSuccess(payload);
     })
     .catch(createSessionFailure);
 };
 
 const shutdown = () => {
-  localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
+  if (localStorage) localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
   location.reload();
   return closeSessionResult();
 };
@@ -52,7 +53,8 @@ const closeSessionApiCall = () => {
 //
 
 const INITIAL_STATE = {
-  sessionToken: localStorage.getItem(SESSION_TOKEN_STORAGE_KEY),
+  sessionToken: global.localStorage &&
+    global.localStorage.getItem(SESSION_TOKEN_STORAGE_KEY),
   isValid: false,
   isLoading: false,
   isLoggining: false,

@@ -5,6 +5,7 @@ class AuthPage extends Component {
     return (
       <div className="auth">
         <h1>Auth</h1>
+        12312
         {this.props.children}
       </div>
     );
