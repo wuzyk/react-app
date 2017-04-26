@@ -1,30 +1,35 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { AppContainer } from 'react-hot-loader';
+import { BrowserRouter } from 'react-router-dom';
+import { CookiesProvider } from 'react-cookie';
+import reducer from './reducer';
+import { configureStore } from './store';
+import Layout from './layout/Layout';
 
-import store from './store';
-import App from './app/components/App/App';
+const store = configureStore(
+  reducer,
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__,
+  window.__INITIAL_STATE__
+);
+
+if (module.hot) {
+  module.hot.accept('./reducer', () => {
+    store.replaceReducer(require('./reducer').default);
+  });
+}
 
 const render = Component => {
   ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <Router>
+    <Provider store={store}>
+      <BrowserRouter history={history}>
+        <CookiesProvider>
           <Component />
-        </Router>
-      </Provider>
-    </AppContainer>,
+        </CookiesProvider>
+      </BrowserRouter>
+    </Provider>,
     document.getElementById('root')
   );
 };
 
-render(App);
-
-if (module.hot) {
-  module.hot.accept('./app/components/App/App', () => {
-    const NextApp = require('./app/components/App/App').default;
-    render(NextApp);
-  });
-}
+render(Layout);

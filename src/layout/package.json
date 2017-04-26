@@ -2,7 +2,8 @@
   "name": "app",
   "version": "0.0.0",
   "dependencies": {
-    "auth": "^0.0.0",
-    "user": "^0.0.0"
+    "auth": "0.0.0",
+    "dashboard": "0.0.0",
+    "user": "0.0.0"
   }
 }

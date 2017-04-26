@@ -1,9 +1,13 @@
-import { APP_TOKEN, SESSION_TOKEN_STORAGE_KEY } from 'constants';
+let _token;
 
 const defaultHeaders = {
-  Authorization: `Bearer ${APP_TOKEN}`,
+  Authorization: `Bearer 992E98CD-8346-4898-B51B-33CF3C839CD7`,
   Accept: 'application/vnd.wallet.openapi.v1+json',
   'Content-Type': 'application/vnd.wallet.openapi.v1+json'
+};
+
+export const setApiToken = token => {
+  _token = token;
 };
 
 export const apiCall = (config = {}) => {
@@ -18,8 +22,11 @@ export const apiCall = (config = {}) => {
   };
 
   if (config.secure !== false) {
-    const token = localStorage.getItem(SESSION_TOKEN_STORAGE_KEY);
-    headers.Authorization = `Bearer ${token}`;
+    if (!_token) {
+      throw Error('Expected api token to be presented');
+    }
+
+    headers.Authorization = `Bearer ${_token}`;
   }
 
   let body = config.body;
@@ -28,7 +35,7 @@ export const apiCall = (config = {}) => {
     body = JSON.stringify(config.json);
   }
 
-  return fetch(config.url, {
+  return fetch('http://localhost:3000' + config.url, {
     method: config.method || 'GET',
     headers,
     body
@@ -40,10 +47,10 @@ export const apiCall = (config = {}) => {
 
       return response.json().then(error => Promise.reject(error));
     })
-    .catch(error =>
-      Promise.reject({
+    .catch(error => {
+      return Promise.reject({
         code: error.Error || 'TRANSPORT_ERROR',
         message: error.ErrorDescription || 'Error occured while receiving data'
-      })
-    );
+      });
+    });
 };

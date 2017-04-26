@@ -1,7 +1,9 @@
 import * as api from './api';
 import { createReducer, createAction } from 'redux-act';
 import { loop, Effects } from 'redux-loop';
-import { sessionReceived } from 'auth/reducer';
+import { actions as authActions } from 'auth';
+
+const { sessionReceived } = authActions;
 
 //
 // actions
@@ -23,6 +25,7 @@ const fetchProfileApiCall = userId => {
 
 const INITIAL_STATE = {
   isFetching: false,
+  isLoaded: false,
   userId: null,
   data: {},
   attrsByType: {}
@@ -43,6 +46,7 @@ const reducer = createReducer(
     [fetchProfileSuccess]: (state, payload) => ({
       ...state,
       isFetching: false,
+      isLoaded: true,
       data: payload,
       attrsByType: payload.UserAttributes.reduce((result, attr) => {
         result[attr.UserAttributeTypeId] = attr;
@@ -58,6 +62,7 @@ const reducer = createReducer(
 );
 
 reducer.getIsFetching = state => state.user.isFetching;
+reducer.getIsLoaded = state => state.user.isLoaded;
 reducer.getUserAttr = (state, attrType) => {
   const attr = state.user.attrsByType[attrType];
   return attr && (attr.DisplayValue || attr.RawValue);

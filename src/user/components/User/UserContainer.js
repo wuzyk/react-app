@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { closeSession } from 'auth/reducer';
+
 import reducer, { fetchProfile } from '../../reducer';
 import User from './User';
+import { actions as authActions } from 'auth';
+
+const { closeSession } = authActions;
 
 class UserContainer extends Component {
   componentWillMount() {
-    this.props.fetchProfile();
+    if (!this.props.isLoaded) {
+      this.props.fetchProfile();
+    }
   }
 
   render() {
@@ -20,8 +25,9 @@ class UserContainer extends Component {
 }
 
 export default connect(
-  state => {
+  (state, ownProps) => {
     return {
+      isLoaded: reducer.getIsLoaded(state),
       isFetching: reducer.getIsFetching(state),
       firstName: reducer.getUserAttr(state, 'FirstName'),
       lastName: reducer.getUserAttr(state, 'LastName')

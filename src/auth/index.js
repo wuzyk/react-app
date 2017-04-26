@@ -1,4 +1,4 @@
-import reducer, * as actions from './reducer';
-import AuthContainer from './components/Auth/AuthContainer';
+import reducer, * as actions from './redux/reducer';
+import Auth from './containers/Auth';
 
-export { reducer, actions, AuthContainer as Auth };
+export { reducer, actions, Auth };

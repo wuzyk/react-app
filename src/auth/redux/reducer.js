@@ -1,51 +1,37 @@
 import { createReducer, createAction } from 'redux-act';
 import { loop, Effects } from 'redux-loop';
 import * as api from './api';
-import { SESSION_TOKEN_STORAGE_KEY } from 'constants';
 
 //
 // actions
 //
 
-export const validateSession = createAction('validate session request');
-export const validateSessionSuccess = createAction('validate session success');
-export const validateSessionFailure = createAction('validate session failure');
-export const createSession = createAction('create session success');
-export const createSessionSuccess = createAction('create session success');
-export const createSessionFailure = createAction('create session failure');
-export const closeSession = createAction('close session request');
-export const closeSessionResult = createAction('close session result');
-export const sessionReceived = createAction('session received');
+export const validateSession = createAction('VALIDATE SESSION');
+export const validateSessionSuccess = createAction('VALIDATE SESSION SUCCESS');
+export const validateSessionFailure = createAction('VALIDATE SESSION FAILURE');
+export const createSession = createAction('CREATE SESSION');
+export const createSessionSuccess = createAction('CREATE SESSION SUCCESS');
+export const createSessionFailure = createAction('CREATE SESSION FAILURE');
+export const closeSession = createAction('CLOSE SESSION');
+export const closeSessionResult = createAction('CREATE SESSION RESULT');
+export const sessionReceived = createAction('SESSION RECEIVED');
 
 const validateSessionApiCall = sessionToken => {
   return api
     .validateSession(sessionToken)
     .then(validateSessionSuccess)
-    .catch(error => {
-      if (localStorage) localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
-      return validateSessionFailure(error);
-    });
+    .catch(validateSessionFailure);
 };
 
 const createSessionApiCall = ({ login, password }) => {
   return api
     .createSession(login, password)
-    .then(payload => {
-      if (localStorage)
-        localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, payload.Token);
-      return createSessionSuccess(payload);
-    })
+    .then(createSessionSuccess)
     .catch(createSessionFailure);
 };
 
-const shutdown = () => {
-  if (localStorage) localStorage.removeItem(SESSION_TOKEN_STORAGE_KEY);
-  location.reload();
-  return closeSessionResult();
-};
-
 const closeSessionApiCall = () => {
-  return api.closeSession().then(shutdown, shutdown);
+  return api.closeSession().then(closeSessionResult, closeSessionResult);
 };
 
 //
@@ -53,9 +39,7 @@ const closeSessionApiCall = () => {
 //
 
 const INITIAL_STATE = {
-  sessionToken: global.localStorage &&
-    global.localStorage.getItem(SESSION_TOKEN_STORAGE_KEY),
-  isValid: false,
+  session: null,
   isLoading: false,
   isLoggining: false,
   error: null
@@ -91,14 +75,15 @@ const reducer = createReducer(
         Effects.call(sessionReceived, payload)
       );
     },
-    [createSessionFailure]: (state, error) => ({
-      ...state,
-      isLoggining: false,
-      error: error.message
-    }),
+    [createSessionFailure]: (state, error) => {
+      return {
+        ...state,
+        isLoggining: false,
+        error: error.message
+      };
+    },
     [sessionReceived]: (state, payload) => ({
       ...state,
-      isValid: true,
       session: payload
     }),
     [closeSession]: state => {
@@ -109,15 +94,16 @@ const reducer = createReducer(
     },
     [closeSessionResult]: state => ({
       ...state,
+      session: null,
       isLoading: false
     })
   },
   INITIAL_STATE
 );
 
-reducer.getSessionToken = state => state.auth.sessionToken;
+reducer.getSessionToken = state =>
+  state.auth.session && state.auth.session.Token;
 reducer.getError = state => state.auth.error;
-reducer.getIsValid = state => state.auth.isValid;
 reducer.getIsLoggining = state => state.auth.isLoggining;
 reducer.getIsLoading = state => state.auth.isLoading;
 

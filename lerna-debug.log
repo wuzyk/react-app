@@ -1,0 +1,41 @@
+lerna(info)    Lerna v2.0.0-rc.2
+lerna(verbose) GitUtilities.isInitialized    ("F:\\_localhost\\apps\\react-app")
+lerna(verbose) GitUtilities.isInitialized    ("F:\\_localhost\\apps\\react-app") => true
+lerna(verbose) FileSystemUtilities.existsSync("F:\\_localhost\\apps\\react-app\\VERSION")
+lerna(verbose) FileSystemUtilities.existsSync("F:\\_localhost\\apps\\react-app\\VERSION") => false
+lerna(verbose) Attempting running BootstrapCommand.initialize
+lerna(verbose) Successfully ran BootstrapCommand.initialize
+lerna(verbose) Attempting running BootstrapCommand.execute
+lerna(info)    Bootstrapping 6 packages
+lerna(info)    Preinstalling packages
+lerna(info)    Installing external dependencies
+lerna(verbose) NpmUtilities.installInDir     ("F:\\_localhost\\apps\\react-app\\src\\api", ["constants@0.0.0"], {})
+lerna(verbose) FileSystemUtilities.rename    ("F:\\_localhost\\apps\\react-app\\src\\api\\package.json", "F:\\_localhost\\apps\\react-app\\src\\ap...)
+lerna(verbose) NpmUtilities.installInDir     ("F:\\_localhost\\apps\\react-app\\src\\auth", ["constants@0.0.0"], {})
+lerna(verbose) FileSystemUtilities.rename    ("F:\\_localhost\\apps\\react-app\\src\\auth\\package.json", "F:\\_localhost\\apps\\react-app\\src\\a...)
+lerna(verbose) FileSystemUtilities.rename    ("F:\\_localhost\\apps\\react-app\\src\\api\\package.json", "F:\\_localhost\\apps\\react-app\\src\\ap...) => 
+lerna(verbose) FileSystemUtilities.rename    ("F:\\_localhost\\apps\\react-app\\src\\auth\\package.json", "F:\\_localhost\\apps\\react-app\\src\\a...) => 
+lerna(verbose) FileSystemUtilities.renameSync("F:\\_localhost\\apps\\react-app\\src\\api\\package.json.lerna_backup", "F:\\_localhost\\apps\\react...)
+lerna(verbose) FileSystemUtilities.renameSync("F:\\_localhost\\apps\\react-app\\src\\api\\package.json.lerna_backup", "F:\\_localhost\\apps\\react...) => 
+lerna(error)   NpmUtilities.installInDir     ("F:\\_localhost\\apps\\react-app\\src\\api", ["constants@0.0.0"], {})
+    Error: Command failed: npm install
+    npm ERR! Windows_NT 10.0.14393
+    npm ERR! argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install"
+    npm ERR! node v6.10.2
+    npm ERR! npm  v3.10.10
+    npm ERR! code ETARGET
+    
+    npm ERR! notarget No compatible version found: constants@0.0.0
+    npm ERR! notarget Valid install targets:
+    npm ERR! notarget 0.0.2, 0.0.1
+    npm ERR! notarget 
+    npm ERR! notarget This is most likely not a problem with npm itself.
+    npm ERR! notarget In most cases you or one of your dependencies are requesting
+    npm ERR! notarget a package version that doesn't exist.
+    
+    npm ERR! Please include the following file with any support request:
+    npm ERR!     F:\_localhost\apps\react-app\src\api\npm-debug.log
+    
+        at Promise.all.then.arr (C:\Users\HOME\AppData\Roaming\npm\node_modules\lerna\node_modules\execa\index.js:210:11)
+        at process._tickCallback (internal/process/next_tick.js:109:7)
+lerna(error)   Errored while running BootstrapCommand.execute

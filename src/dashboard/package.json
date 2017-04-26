@@ -1,0 +1,7 @@
+{
+  "name": "dashboard",
+  "version": "0.0.0",
+  "dependencies": {
+    "ui": "0.0.0"
+  }
+}

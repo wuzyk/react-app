@@ -40,11 +40,11 @@ module.exports = {
     // the line below with these two lines if you prefer the stock client:
     //require.resolve('webpack-dev-server/client') + '?/',
     //require.resolve('webpack/hot/dev-server'),
-    require.resolve('react-dev-utils/webpackHotDevClient'),
-    // react hot reloader
-    require.resolve('react-hot-loader/patch'),
+    //require.resolve('react-dev-utils/webpackHotDevClient'),
     // We ship a few polyfills by default:
     require.resolve('./polyfills'),
+    'webpack-hot-middleware/client',
+    // react hot reloader
     // Finally, this is your app's code:
     paths.appIndexJs
     // We include the app code last so that if there is a runtime error during
@@ -131,7 +131,26 @@ module.exports = {
           // This is a feature of `babel-loader` for webpack (not Babel itself).
           // It enables caching results in ./node_modules/.cache/babel-loader/
           // directory for faster rebuilds.
-          cacheDirectory: true
+          cacheDirectory: true,
+          env: {
+            development: {
+              presets: ['react-hmre'],
+              plugins: [
+                [
+                  'react-transform',
+                  {
+                    transforms: [
+                      {
+                        transform: 'react-transform-hmr',
+                        imports: ['react'],
+                        locals: ['module']
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
         }
       },
       // "postcss" loader applies autoprefixer to our CSS.
@@ -180,12 +199,12 @@ module.exports = {
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(env.raw),
+    //new InterpolateHtmlPlugin(env.raw),
     // Generates an `index.html` file with the <script> injected.
-    new HtmlWebpackPlugin({
+    /*new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml
-    }),
+    }),*/
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),

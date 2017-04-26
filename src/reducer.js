@@ -1,10 +1,16 @@
 import { combineReducers } from 'redux-loop';
 
+import { reducer as authReducer } from './auth';
+import { reducer as userReducer } from './user';
+
 export default combineReducers(
-  allReducers(require.context('.', true, /^\.\/[^/]*\/reducer\.js$/))
+  {
+    auth: authReducer,
+    user: userReducer
+  } //allReducers(require.context('.', true, /^\.\/[^/]*\/reducer\.js$/))
 );
 
-function allReducers(requireContext) {
+/*function allReducers(requireContext) {
   return requireContext.keys().reduce((reducers, reducer) => {
     const featureName = reducer.split('/')[1];
     return {
@@ -12,4 +18,4 @@ function allReducers(requireContext) {
       [featureName]: requireContext(reducer).default
     };
   }, {});
-}
+}*/

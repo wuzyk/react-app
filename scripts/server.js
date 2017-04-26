@@ -2,6 +2,8 @@
 
 var fs = require('fs');
 
+process.env.NODE_ENV = 'development';
+
 var babelrc = fs.readFileSync('./.babelrc');
 var config;
 
@@ -12,8 +14,8 @@ try {
   console.error(err);
 }
 
-process.env.NODE_ENV = 'development';
-
 require('babel-register')(config);
+
+require('../config/polyfills');
 
 require('../src/server.js');

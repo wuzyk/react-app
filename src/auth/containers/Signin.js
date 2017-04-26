@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import reducer, { createSession } from '../../reducer';
-import SigninForm from './Signin';
+import reducer, { createSession } from '../redux/reducer';
+import SigninForm from '../components/SigninForm';
 
-class SigninFormContainer extends React.Component {
+class Signin extends React.Component {
   constructor(props) {
     super(props);
 
@@ -69,9 +69,12 @@ class SigninFormContainer extends React.Component {
 }
 
 export default connect(
-  state => ({
-    signinError: reducer.getError(state),
-    isProcessing: reducer.getIsLoggining(state)
-  }),
+  state => {
+    const st = {
+      signinError: reducer.getError(state),
+      isProcessing: reducer.getIsLoggining(state)
+    };
+    return st;
+  },
   dispatch => bindActionCreators({ createSession }, dispatch)
-)(SigninFormContainer);
+)(Signin);

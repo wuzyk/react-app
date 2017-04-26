@@ -224,8 +224,6 @@ function addMiddleware(devServer) {
     // Tip: use https://jex.im/regulex/ to visualize the regex
     var mayProxy = /^(?!\/(index\.html$|.*\.hot-update\.json$|sockjs-node\/)).*$/;
 
-    console.log('123');
-
     // Pass the scope regex both to Express and to the middleware for proxying
     // of both HTTP and WebSockets to work without false positives.
     var hpm = httpProxyMiddleware(pathname => mayProxy.test(pathname), {
